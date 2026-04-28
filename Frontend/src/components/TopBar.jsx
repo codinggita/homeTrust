@@ -21,7 +21,6 @@ import {
 import { Avatar, AvatarFallback } from "@/components/avatar";
 import { useAuthStore, useNotificationStore } from "@/stores";
 import NotificationPanel from "./NotificationPanel";
-import RoleSwitcher from "./RoleSwitcher";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -30,7 +29,7 @@ const NAV_LINKS = [
   { to: "/listings/browse", label: "Rentals" },
   { to: "/report/compare", label: "Locality Compare" },
   { to: "/listings/compare", label: "Property Compare" },
-  { to: "/rent-vs-buy", label: "Rent vs Buy" },
+
   { to: "/profile", label: "Profile" },
   { to: "/about", label: "About" },
 ];
@@ -106,8 +105,6 @@ export default function TopBar() {
               </span>
             )}
           </Button>
-
-          <RoleSwitcher />
 
           {isLoggedIn ? (
             <DropdownMenu>

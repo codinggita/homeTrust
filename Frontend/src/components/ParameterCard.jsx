@@ -29,6 +29,7 @@ import { Button } from "@/components/button";
 import { cn } from "@/lib/utils";
 
 const ICONS = {
+  // mock keys
   aqi: Wind,
   walkability: Activity,
   flood: Droplets,
@@ -40,6 +41,15 @@ const ICONS = {
   green: Leaf,
   internet: Wifi,
   power: Zap,
+  // real backend keys
+  floodRisk      : Droplets,
+  safety         : ShieldAlert,
+  metroProximity : Train,
+  schoolRating   : School,
+  hospitalAccess : Stethoscope,
+  greenCover     : Leaf,
+  internetSpeed  : Wifi,
+  powerReliability: Zap,
 };
 
 const STATUS_COLOR = {
@@ -80,7 +90,7 @@ export default function ParameterCard({ p, onShowOnMap }) {
           <div>
             <div className="text-sm font-semibold">{p.label}</div>
             <div className="text-xs text-muted-foreground capitalize">
-              {p.status}
+              {p.label2 || p.status}
             </div>
           </div>
         </div>
