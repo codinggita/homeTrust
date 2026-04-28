@@ -1,37 +1,51 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Home, ShieldCheck } from "lucide-react";
+import { Home, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { useAuthStore } from "@/stores";
+import { authApi } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function LoginPage() {
-  const [params] = useSearchParams();
-  const redirect = params.get("redirect") || "/";
-  const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
+  const [params]  = useSearchParams();
+  const redirect  = params.get("redirect") || "/";
+  const navigate  = useNavigate();
+  const loginStore = useAuthStore((s) => s.login);
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("buyer");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     if (!email) return toast.error("Email is required");
+    if (!password) return toast.error("Password is required");
+
     setLoading(true);
-    setTimeout(() => {
-      login(email, role);
-      toast.success("Welcome back to HomeTrust");
+    try {
+      const { data } = await authApi.login({ email, password });
+      loginStore(data.token, data.user);
+      toast.success(`Welcome back to HomeTrust!`);
+      // Route based on role
+      const dest =
+        data.user.role === "admin"   ? "/admin/dashboard" :
+        data.user.role === "broker"  ? "/broker/dashboard" :
+        redirect;
+      navigate(dest, { replace: true });
+    } catch (err) {
+      const msg = err.response?.data?.error || "Invalid email or password.";
+      toast.error(msg);
+    } finally {
       setLoading(false);
-      navigate(redirect);
-    }, 400);
+    }
   };
 
   return (
     <div className="grid min-h-screen md:grid-cols-2">
+      {/* Left branding panel */}
       <aside className="hidden gradient-navy p-10 text-primary-foreground md:flex md:flex-col md:justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gold">
@@ -46,12 +60,12 @@ export default function LoginPage() {
             Free intelligence. Verified listings.
           </h2>
           <p className="mt-3 text-sm text-primary-foreground/70">
-            Sign in to save reports, compare localities, and access verified
-            rental inventory with broker trust scores.
+            Sign in to save neighborhood reports, compare localities, and access
+            verified rental inventory with broker trust scores.
           </p>
           <div className="mt-8 flex items-center gap-2 text-xs text-primary-foreground/70">
-            <ShieldCheck className="h-4 w-4 text-gold" /> Institutional-grade
-            data · AI moderated
+            <ShieldCheck className="h-4 w-4 text-gold" />
+            Institutional-grade data · AI moderated · Always free
           </div>
         </div>
         <p className="text-xs text-primary-foreground/60">
@@ -59,9 +73,10 @@ export default function LoginPage() {
         </p>
       </aside>
 
+      {/* Right: form */}
       <section className="flex items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md">
-          <div className="md:hidden">
+          <div className="md:hidden mb-6">
             <Link to="/" className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-navy">
                 <Home className="h-4 w-4 text-gold" />
@@ -71,9 +86,10 @@ export default function LoginPage() {
               </span>
             </Link>
           </div>
-          <h1 className="mt-6 font-serif text-3xl font-bold">Sign in</h1>
+
+          <h1 className="font-serif text-3xl font-bold">Sign in</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Enter any email to continue (demo only).
+            Use the credentials you registered with.
           </p>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
@@ -88,51 +104,35 @@ export default function LoginPage() {
                 placeholder="you@example.com"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Sign in as</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {["buyer", "broker", "admin"].map((r) => (
-                  <button
-                    type="button"
-                    key={r}
-                    onClick={() => setRole(r)}
-                    className={`rounded-md border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition ${
-                      role === r
-                        ? "border-navy bg-navy text-primary-foreground"
-                        : "border-border bg-background hover:border-navy/40"
-                    }`}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="h-3.5 w-3.5 rounded border-border"
-                />{" "}
-                Remember me
-              </label>
-              <Link
-                to="/forgot-password"
-                className="font-medium text-navy hover:text-navy/80"
-              >
-                Forgot password?
-              </Link>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-navy hover:text-navy/80"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPass ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                >
+                  {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <Button
@@ -140,16 +140,19 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-navy text-primary-foreground hover:bg-navy/90"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
 
+          <div className="mt-4 rounded-lg border border-border bg-secondary/40 p-3 text-xs text-muted-foreground">
+            <strong className="text-foreground">Demo credentials:</strong><br />
+            Buyer: test.buyer@hometrust.in / Secure@1234<br />
+            Broker: test.broker@hometrust.in / Secure@1234
+          </div>
+
           <p className="mt-6 text-center text-sm text-muted-foreground">
             New to HomeTrust?{" "}
-            <Link
-              to="/signup"
-              className="font-semibold text-navy hover:text-navy/80"
-            >
+            <Link to="/signup" className="font-semibold text-navy hover:text-navy/80">
               Create an account
             </Link>
           </p>
