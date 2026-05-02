@@ -52,22 +52,34 @@ const app = express();
 app.use(helmet());
 
 // ── CORS ─────────────────────────────────────────────────────
-const allowedOrigins = (process.env.CORS_ORIGINS || '')
-  .split(',')
-  .map(o => o.trim())
-  .filter(Boolean);
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://hometrust.onrender.com',
+  ...(process.env.CORS_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean)
+];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser clients (Postman, server-to-server)
+    // 1. Allow non-browser clients (Postman, server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+
+    // 2. Allow exact matches from allowedOrigins
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
+
+    // 3. Allow Vercel preview/production domains (e.g. hometrust.vercel.app or hometrust-xxx.vercel.app)
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+
+    // 4. Block others
     callback(new Error(`CORS policy blocked origin: ${origin}`));
   },
   credentials: true,
 }));
+
 
 // ── Body parsers ──────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
