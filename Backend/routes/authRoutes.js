@@ -18,4 +18,17 @@ router.post('/login', authLimiter, validate(schemas.login), controller.login);
 // GET /api/auth/me
 router.get('/me', verifyToken, controller.getMe);
 
+// POST /api/auth/logout
+router.post('/logout', verifyToken, controller.logout);
+
+// POST /api/auth/forgot-password
+router.post('/forgot-password', authLimiter, validate(schemas.forgotPassword), controller.forgotPassword);
+
+// POST /api/auth/reset-password
+router.post('/reset-password', authLimiter, validate(schemas.resetPassword), controller.resetPassword);
+
+// POST /api/auth/refresh-token
+router.post('/refresh-token', controller.refreshToken);
+
+
 module.exports = router;

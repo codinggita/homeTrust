@@ -26,4 +26,12 @@ router.post('/verify-listing/:id', validate(schemas.adminVerifyListing), control
 // GET /api/admin/analytics
 router.get('/analytics', controller.getAnalytics);
 
+// GET /api/admin/users
+router.get('/users', controller.getAllUsers);
+
+// PATCH /api/admin/users/:id/status
+router.patch('/users/:id/status', validate(schemas.updateUserStatus), controller.updateUserStatus);
+
+
 module.exports = router;
+

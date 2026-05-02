@@ -82,6 +82,20 @@ const adminVerifyListingSchema = Joi.object({
   verificationLevel : Joi.string().valid('silver', 'gold', 'platinum').required(),
 });
 
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email().lowercase().required(),
+});
+
+const resetPasswordSchema = Joi.object({
+  email      : Joi.string().email().lowercase().required(),
+  code       : Joi.string().length(6).required(),
+  newPassword: Joi.string().min(8).max(72).required(),
+});
+
+const updateUserStatusSchema = Joi.object({
+  isSuspended: Joi.boolean().required(),
+});
+
 // ─── Middleware Factory ───────────────────────────────────────────────────────
 
 /**
@@ -111,5 +125,9 @@ module.exports = {
     comparePincodes     : comparePincodesSchema,
     adminResolve        : adminResolveSchema,
     adminVerifyListing  : adminVerifyListingSchema,
+    forgotPassword      : forgotPasswordSchema,
+    resetPassword       : resetPasswordSchema,
+    updateUserStatus    : updateUserStatusSchema,
   },
 };
+

@@ -1,0 +1,689 @@
+{
+	"info": {
+		"_postman_id": "35f9d24f-8128-40cf-9977-353709db09cf",
+		"name": "HomeTrust API - Production v1",
+		"description": "Enterprise-quality real estate intelligence platform. Features:\n- Institutional-grade neighborhood quality reports\n- Verified, scam-free rental listings\n- Multi-tier broker verification (Bronze to Platinum)\n- AI-driven trust scores\n- Admin moderation tools",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"fullName\": \"John Doe\",\n    \"phone\": \"9876543210\",\n    \"role\": \"buyer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						},
+						"description": "Registers a new user (Buyer or Broker)."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticates user and returns JWT."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Fetches current user profile from token."
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgot-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "Requests a reset code for password recovery."
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"code\": \"123456\",\n    \"newPassword\": \"newSecurePassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Resets password using the recovery code."
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"YOUR_REFRESH_TOKEN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh-token"
+							]
+						},
+						"description": "Rotates the access token and refresh token using a valid refresh token."
+					},
+					"response": []
+				}
+
+			],
+			"description": "User lifecycle and security."
+		},
+		{
+			"name": "Listings",
+			"item": [
+				{
+					"name": "Browse All Listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/listings?minPrice=10000&maxPrice=50000&bhk=2,3&sortBy=reliability",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"listings"
+							],
+							"query": [
+								{
+									"key": "minPrice",
+									"value": "10000"
+								},
+								{
+									"key": "maxPrice",
+									"value": "50000"
+								},
+								{
+									"key": "bhk",
+									"value": "2,3"
+								},
+								{
+									"key": "sortBy",
+									"value": "reliability"
+								}
+							]
+						},
+						"description": "Fetch active property listings with advanced filtering."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Listing Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/listings/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"listings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "65b802a3..."
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Listing (Broker)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "addressFull",
+									"value": "Flat 402, Skyline Apartments, HSR Layout",
+									"type": "text"
+								},
+								{
+									"key": "pincode",
+									"value": "560102",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "35000",
+									"type": "text"
+								},
+								{
+									"key": "bhk",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "area",
+									"value": "1200",
+									"type": "text"
+								},
+								{
+									"key": "photos",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/listings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"listings"
+							]
+						},
+						"description": "Submit a new property listing. Requires Broker role + KYC doc."
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Favorite",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/listings/:id/favorite",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"listings",
+								":id",
+								"favorite"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "listing_id"
+								}
+							]
+						},
+						"description": "Save or unsave a listing to favorites."
+					},
+					"response": []
+				},
+				{
+					"name": "Request Visit (QR)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/listings/:id/visit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"listings",
+								":id",
+								"visit"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "listing_id"
+								}
+							]
+						},
+						"description": "Generate a unique visit token and QR data for gate access."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Generate Neighborhood Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/report/:pincode",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"report",
+								":pincode"
+							],
+							"variable": [
+								{
+									"key": "pincode",
+									"value": "560034"
+								}
+							]
+						},
+						"description": "Fetch real-time neighborhood metrics including AQI, Connectivity, and Safety."
+					},
+					"response": []
+				},
+				{
+					"name": "Compare Pincodes",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pincodes\": [\"560034\", \"560102\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/report/compare",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"report",
+								"compare"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Broker",
+			"item": [
+				{
+					"name": "Broker Dashboard Stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/broker/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"broker",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Verification Doc",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "type",
+									"value": "kyc",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/broker/verify-document",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"broker",
+								"verify-document"
+							]
+						},
+						"description": "Upload document (KYC, Ownership, Live Photo, Video) to upgrade badge tier."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "View Verification Queue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/verification-queue",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"verification-queue"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Platform Analytics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/analytics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"analytics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/users?role=broker",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "broker"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "General",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hometrust.onrender.com/health",
+							"protocol": "https",
+							"host": [
+								"hometrust",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ping API",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ping",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ping"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://hometrust.onrender.com/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "YOUR_JWT_TOKEN",
+			"type": "string"
+		}
+	]
+}

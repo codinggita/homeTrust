@@ -45,6 +45,8 @@ const reportRoutes  = require('./routes/reportRoutes');
 const listingRoutes = require('./routes/listingRoutes');
 const brokerRoutes  = require('./routes/brokerRoutes');
 const adminRoutes   = require('./routes/adminRoutes');
+const generalRoutes = require('./routes/generalRoutes');
+
 
 const app = express();
 
@@ -56,8 +58,10 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'https://hometrust.onrender.com',
+  'https://home-trust-main.vercel.app',
   ...(process.env.CORS_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean)
 ];
+
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -100,11 +104,13 @@ if (process.env.NODE_ENV !== 'test') {
 app.get('/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
 // ── API Routes ────────────────────────────────────────────────
+app.use('/api',          generalRoutes);
 app.use('/api/auth',     authRoutes);
 app.use('/api/report',   reportRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/broker',   brokerRoutes);
 app.use('/api/admin',    adminRoutes);
+
 
 // ── 404 fallback ──────────────────────────────────────────────
 app.use((_req, res) => res.status(404).json({ error: 'Route not found' }));
