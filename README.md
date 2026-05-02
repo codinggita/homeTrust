@@ -12,16 +12,19 @@ HomeTrust provides **institutional‑grade, unbiased data** for any locality and
 ## 📌 Table of Contents
 
 - [Problem Statements](#problem-statements)
-- [Approach & Methodology](#approach--methodology)
 - [Solution Overview](#solution-overview)
-- [Modules & Features](#modules--features)
-- [Architecture & Tech Stack](#architecture--tech-stack)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
 - [Installation & Setup](#installation--setup)
 - [Usage Guide](#usage-guide)
-- [Database Schema (Conceptual)](#database-schema-conceptual)
+- [API Endpoints](#api-endpoints)
+- [Database Schema](#database-schema)
+- [External APIs](#external-apis)
 - [Future Scope](#future-scope)
 - [Contributing](#contributing)
 - [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
@@ -45,82 +48,62 @@ HomeTrust provides **institutional‑grade, unbiased data** for any locality and
 
 ---
 
-## 🧠 Approach & Methodology
-
-### For Neighborhood Reports
-- **Data Aggregation:** Gather data from multiple free/open sources (OpenWeatherMap AQI, Overpass API for amenities, OSM for walkability, government crime/flood records, etc.).
-- **Scoring Engine:** Normalize raw data into 0–100 scores, apply weighted averaging (AQI 25%, Walkability 20%, Flood 15%, Crime 20%, Amenities 20%), and generate an overall livability score.
-- **User Experience:** Interactive map search, one‑click report generation, expandable parameter details, PDF export, and side‑by‑side locality comparison.
-- **Caching:** Store reports for 24 hours to reduce API calls and improve speed.
-
-### For Verified Rental Listings
-- **Multi‑Layer Verification:**
-  - **Broker KYC:** Mandatory ID upload (Aadhaar/PAN) for listing.
-  - **Document Verification:** Ownership proof, rent agreement draft.
-  - **Live Geo‑tagged Photos:** Camera‑forced upload with timestamp and location.
-  - **Video Walkthrough** (optional for Platinum badge).
-- **AI‑Assisted Scam Detection:** Reverse image search, price anomaly detection, duplicate listing cross‑check, address validation.
-- **Trust Badges:** Bronze → Silver → Gold → Platinum, each requiring progressively more verification.
-- **Strike System:** 3 strikes lead to account suspension.
-- **Admin Moderation Queue:** Reported listings, verification requests, AI‑flagged suspicious listings.
-
----
-
 ## 💡 Solution Overview
 
-HomeTrust is a **React‑based web application** (Vite + Tailwind + shadcn/ui) that offers:
+HomeTrust is a **React (frontend) + Node.js (backend)** application that offers:
 
-- **Free, unlimited neighborhood reports** with 11 livability parameters.
-- **Verified rental listings** – only brokers who pass KYC and document verification can list.
-- **Trust badges & trust scores** – visible on every listing card.
-- **Admin dashboard** to moderate reported listings, approve high‑tier badges, and monitor scam trends.
+- **Free, unlimited neighborhood reports** with 11 livability parameters across all 30,000+ Indian pincodes.
+- **Verified rental listings** – only brokers who pass KYC and document verification can list properties.
+- **Trust badges & trust scores** (Bronze, Silver, Gold, Platinum) – visible on every listing card.
+- **Admin dashboard** to moderate reported listings, approve high‑tier badge upgrades, and monitor scam trends.
 - **Broker dashboard** with performance metrics, listing management, and a multi‑step listing wizard.
 - **User profiles** to save reports, manage alert preferences, and export data.
+- **Rent vs Buy Analyzer** – financial comparison tool.
 
-All data is **mocked** for the MVP, but the architecture is ready to plug into real APIs (OpenWeatherMap, Google Places, etc.).
+All data is **mocked** for the MVP, but the architecture is ready to plug into real APIs (OpenWeatherMap, Overpass API, NCRB crime data, etc.).
 
 ---
 
-## 🧩 Modules & Features
+## 🧩 Features
 
 ### Module 1: Neighborhood Quality Reports
 
 | Feature | Description |
 |---------|-------------|
-| **Search by location** | Autocomplete, interactive map (draggable pin), geolocation. |
-| **11‑parameter scoring** | AQI, Walkability, Flood risk, Crime, Noise, Metro, Schools, Hospitals, Green cover, Internet, Power. |
-| **Expandable details** | For AQI: PM2.5, PM10, NO2, hourly forecast. For Walkability: list of amenities with distances. etc. |
-| **Overall livability gauge** | Circular gauge (0–100) with color coding. |
-| **Pros & Cons** | Auto‑generated from scores. |
-| **City comparison** | Bar chart comparing each parameter to city average. |
+| **Search by pincode** | Autocomplete, popular localities, pan‑India coverage map. |
+| **11‑parameter scoring** | AQI, Walkability, Flood risk, Crime, Noise, Metro proximity, School rating, Hospital access, Green cover, Internet speed, Power reliability. |
+| **Expandable details** | Each parameter shows detailed data (e.g., for AQI: PM2.5, PM10, NO2, hourly forecast). |
+| **Overall livability gauge** | Circular gauge (0–100) with grade (A–E). |
+| **Strengths & concerns** | Auto‑generated lists from scores. |
+| **Comparison to city average** | Bar chart. |
 | **1km radius map** | Amenity icons (hospitals, schools, parks, grocery, metro). |
-| **PDF export** | One‑click mock PDF download. |
+| **PDF export** | One‑click download (mock). |
 | **Save reports** | Unlimited saved reports per user. |
-| **Compare localities** | Side‑by‑side table (up to 3 localities), export CSV. |
+| **Compare localities** | Side‑by‑side table (up to 3 pincodes), export CSV. |
 
 ### Module 2: Verified Rental Listings
 
 | Feature | Description |
 |---------|-------------|
 | **Trusted Only toggle** | Hides all unverified listings by default. |
-| **Advanced filters** | Price, BHK, verification level (Platinum/Gold/Silver), min trust score. |
-| **Listing cards** | Image, price, address, trust badge, trust score circle, broker name, report icon. |
+| **Advanced filters** | Price range, BHK, verification level (Platinum/Gold/Silver/Bronze), min trust score slider. |
+| **Listing cards** | Image, price, address, trust badge, trust score circle, broker name, “Report fake” icon. |
 | **Listing detail page** | Image gallery, verification progress bar, trust score breakdown, property specs, rent history chart, neighborhood snapshot, broker profile. |
 | **Request Visit** | Generates mock QR code for gate access. |
 | **Report Fake Listing** | Submit with reason – goes to admin queue. |
-| **Broker Dashboard** | Stats (listings, views, contacts, strikes), add listing wizard, listing management table, performance charts. |
+| **Broker Dashboard** | Stats (listings, views, contacts, strikes), add listing wizard (6 steps), listing management table, performance charts. |
 | **Admin Dashboard** | Reported listings queue, verification queue, AI flagged queue, fake trends by city, top offending brokers. |
 
 ### Shared & User Features
 
-- **Authentication** – Login/signup with role selection (buyer, broker, admin).
+- **Authentication** – Signup/login with role selection (buyer, broker, admin). JWT based.
 - **User Profile** – Edit personal info, saved locations, notification preferences, data export (JSON).
 - **Notifications** – In‑app toast + bell icon with mock alerts.
-- **Dark Mode** – Toggle between light and dark themes.
+- **Rent vs Buy Analyzer** – Compare long‑term costs of renting vs buying (property appreciation, rent increases, net equity).
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+## 🏗️ Tech Stack
 
 ### Frontend (React JS only)
 
@@ -139,36 +122,21 @@ All data is **mocked** for the MVP, but the architecture is ready to plug into r
 | **html2pdf.js** | Mock PDF export. |
 | **@faker-js/faker** | Mock data generation. |
 
-### Backend (Planned for future – currently all mock)
+### Backend (Node.js + Express)
 
-- Node.js + Express (REST API)
-- PostgreSQL (with PostGIS for geospatial queries)
-- Redis (caching)
-- JWT authentication
-
-### External APIs (to be integrated later)
-
-- OpenWeatherMap Air Pollution API (AQI)
-- Overpass API / OpenStreetMap (amenities, walkability)
-- Google Places API (schools, hospitals)
-- OSRM (routing & isochrones)
-- DigiLocker / Signzy (KYC verification)
+| Technology | Purpose |
+|------------|---------|
+| **Node.js + Express** | REST API server. |
+| **MongoDB Atlas** | Database (free tier). |
+| **Mongoose** | ODM for MongoDB. |
+| **JWT + bcrypt** | Authentication. |
+| **Multer + Cloudinary** | File uploads (listing photos, documents). |
+| **Axios** | External API calls (OpenWeatherMap, Overpass, Open‑Elevation). |
+| **express-rate-limit** | Rate limiting. |
+| **Joi** | Request validation. |
+| **winston + morgan** | Logging. |
+| **helmet + cors + xss-clean** | Security. |
 
 ---
 
-## 🚀 Installation & Setup
-
-### Prerequisites
-
-- Node.js 18+ and npm/yarn/pnpm
-
-Figma Link :- https://www.figma.com/design/PsVdgzJknFFixgqsEJQ78E/Untitled?node-id=0-1&m=dev&t=N2MY0jxdtTEsMqIA-1
-
-### Steps
-
-
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/hometrust.git
-   cd hometrust
+## 🧱 Architecture
