@@ -1,174 +1,245 @@
 # HomeTrust – Institutional‑Grade Real Estate Intelligence Platform
 
-**HomeTrust** is a free, dual‑module platform that solves two critical problems in the Indian real estate market:
+HomeTrust is a free dual‑module platform built to improve trust and transparency in the Indian real estate market.
 
-1. **Homebuyers lack standardized neighborhood quality data** – making multi‑crore investment decisions without comprehensive, data‑driven insights into AQI, walkability, crime, flood risk, transit, schools, hospitals, green cover, internet speed, and power reliability.
-2. **Half of rental listings are fake broker clickbait** – prospective tenants waste time on fraudulent ads with fake photos, unavailable properties, and bait‑and‑switch tactics designed only to capture contact information.
+It solves two major problems:
 
-HomeTrust provides **institutional‑grade, unbiased data** for any locality and a **scam‑free, verified rental marketplace** with broker KYC, trust badges, AI‑assisted scam detection, and a transparent moderation system – all completely free.
+* **Lack of reliable neighborhood insights** for homebuyers making high‑value property decisions.
+* **Fake rental listings and broker clickbait** that waste renters’ time and reduce trust.
 
----
-
-## 📌 Table of Contents
-
-- [Problem Statements](#problem-statements)
-- [Approach & Methodology](#approach--methodology)
-- [Solution Overview](#solution-overview)
-- [Modules & Features](#modules--features)
-- [Architecture & Tech Stack](#architecture--tech-stack)
-- [Installation & Setup](#installation--setup)
-- [Usage Guide](#usage-guide)
-- [Database Schema (Conceptual)](#database-schema-conceptual)
-- [Future Scope](#future-scope)
-- [Contributing](#contributing)
-- [License](#license)
+HomeTrust combines **data‑driven locality intelligence** with a **verified rental marketplace** to help users make safer and smarter real estate decisions.
 
 ---
 
-## 🔍 Problem Statements
+# 🚀 Key Features
 
-### Problem 1: No Standardized Neighborhood Quality Data
-> *Homebuyers making multi‑crore investment decisions lack comprehensive, data‑driven information about neighborhood characteristics like school quality, crime statistics, air quality indices, water availability, power outage frequency, and future infrastructure plans that would inform purchasing choices beyond individual property inspection.*
+## 1. Neighborhood Quality Reports
 
-**Consequences:**
-- Buyers rely on biased broker opinions or random online forums.
-- Critical factors (flood risk, noise pollution, actual commute times) are ignored until after purchase.
-- No objective way to compare localities side‑by‑side.
+Get a complete locality intelligence report using pincode search.
 
-### Problem 2: Fake Rental Listings (Broker Clickbait)
-> *Prospective tenants searching for rental homes discover that half of attractive listings on property portals are fraudulent advertisements posted by brokers using fake photos, unavailable properties, or significantly different actual offerings designed purely to capture contact information and generate commission‑based inquiries.*
+### Features
 
-**Consequences:**
-- Tenants waste weeks chasing non‑existent properties.
-- Legitimate brokers lose trust and business.
-- No accountability or strike system for repeat offenders.
+* Search locality by **pincode**
+* **Livability Score (0–100)** with grade system
+* 11 quality parameters including:
 
----
-
-## 🧠 Approach & Methodology
-
-### For Neighborhood Reports
-- **Data Aggregation:** Gather data from multiple free/open sources (OpenWeatherMap AQI, Overpass API for amenities, OSM for walkability, government crime/flood records, etc.).
-- **Scoring Engine:** Normalize raw data into 0–100 scores, apply weighted averaging (AQI 25%, Walkability 20%, Flood 15%, Crime 20%, Amenities 20%), and generate an overall livability score.
-- **User Experience:** Interactive map search, one‑click report generation, expandable parameter details, PDF export, and side‑by‑side locality comparison.
-- **Caching:** Store reports for 24 hours to reduce API calls and improve speed.
-
-### For Verified Rental Listings
-- **Multi‑Layer Verification:**
-  - **Broker KYC:** Mandatory ID upload (Aadhaar/PAN) for listing.
-  - **Document Verification:** Ownership proof, rent agreement draft.
-  - **Live Geo‑tagged Photos:** Camera‑forced upload with timestamp and location.
-  - **Video Walkthrough** (optional for Platinum badge).
-- **AI‑Assisted Scam Detection:** Reverse image search, price anomaly detection, duplicate listing cross‑check, address validation.
-- **Trust Badges:** Bronze → Silver → Gold → Platinum, each requiring progressively more verification.
-- **Strike System:** 3 strikes lead to account suspension.
-- **Admin Moderation Queue:** Reported listings, verification requests, AI‑flagged suspicious listings.
+  * AQI & pollution
+  * Walkability
+  * Crime level
+  * Flood risk
+  * Noise pollution
+  * Metro/public transport access
+  * Schools & hospitals nearby
+  * Green cover
+  * Internet speed
+  * Power reliability
+* City average comparison
+* Save reports for later
+* Compare up to 3 localities
+* PDF export support
 
 ---
 
-## 💡 Solution Overview
+## 2. Verified Rental Marketplace
 
-HomeTrust is a **React‑based web application** (Vite + Tailwind + shadcn/ui) that offers:
+A scam‑resistant rental platform with broker accountability.
 
-- **Free, unlimited neighborhood reports** with 11 livability parameters.
-- **Verified rental listings** – only brokers who pass KYC and document verification can list.
-- **Trust badges & trust scores** – visible on every listing card.
-- **Admin dashboard** to moderate reported listings, approve high‑tier badges, and monitor scam trends.
-- **Broker dashboard** with performance metrics, listing management, and a multi‑step listing wizard.
-- **User profiles** to save reports, manage alert preferences, and export data.
+### Features
 
-All data is **mocked** for the MVP, but the architecture is ready to plug into real APIs (OpenWeatherMap, Google Places, etc.).
-
----
-
-## 🧩 Modules & Features
-
-### Module 1: Neighborhood Quality Reports
-
-| Feature | Description |
-|---------|-------------|
-| **Search by location** | Autocomplete, interactive map (draggable pin), geolocation. |
-| **11‑parameter scoring** | AQI, Walkability, Flood risk, Crime, Noise, Metro, Schools, Hospitals, Green cover, Internet, Power. |
-| **Expandable details** | For AQI: PM2.5, PM10, NO2, hourly forecast. For Walkability: list of amenities with distances. etc. |
-| **Overall livability gauge** | Circular gauge (0–100) with color coding. |
-| **Pros & Cons** | Auto‑generated from scores. |
-| **City comparison** | Bar chart comparing each parameter to city average. |
-| **1km radius map** | Amenity icons (hospitals, schools, parks, grocery, metro). |
-| **PDF export** | One‑click mock PDF download. |
-| **Save reports** | Unlimited saved reports per user. |
-| **Compare localities** | Side‑by‑side table (up to 3 localities), export CSV. |
-
-### Module 2: Verified Rental Listings
-
-| Feature | Description |
-|---------|-------------|
-| **Trusted Only toggle** | Hides all unverified listings by default. |
-| **Advanced filters** | Price, BHK, verification level (Platinum/Gold/Silver), min trust score. |
-| **Listing cards** | Image, price, address, trust badge, trust score circle, broker name, report icon. |
-| **Listing detail page** | Image gallery, verification progress bar, trust score breakdown, property specs, rent history chart, neighborhood snapshot, broker profile. |
-| **Request Visit** | Generates mock QR code for gate access. |
-| **Report Fake Listing** | Submit with reason – goes to admin queue. |
-| **Broker Dashboard** | Stats (listings, views, contacts, strikes), add listing wizard, listing management table, performance charts. |
-| **Admin Dashboard** | Reported listings queue, verification queue, AI flagged queue, fake trends by city, top offending brokers. |
-
-### Shared & User Features
-
-- **Authentication** – Login/signup with role selection (buyer, broker, admin).
-- **User Profile** – Edit personal info, saved locations, notification preferences, data export (JSON).
-- **Notifications** – In‑app toast + bell icon with mock alerts.
-- **Dark Mode** – Toggle between light and dark themes.
+* Trusted listings filter
+* Broker verification badges
+* AI‑assisted scam detection
+* Fake listing reporting system
+* Listing trust score
+* Rental filters (price, BHK, trust level)
+* Request visit with QR code
+* Broker profile & performance metrics
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+# 🧠 Core Idea
 
-### Frontend (React JS only)
+HomeTrust creates an **institutional‑style real estate intelligence system** using multiple data layers.
 
-| Technology | Purpose |
-|------------|---------|
-| **React 18 + Vite** | Core framework & build tool. |
-| **React Router DOM v6** | Routing & protected routes. |
-| **Tailwind CSS** | Utility‑first styling. |
-| **shadcn/ui** | Pre‑built accessible components (buttons, modals, toasts, sheets). |
-| **Zustand** | Global state management (auth, reports, listings, notifications). |
-| **React Query** | Data fetching & caching (mock APIs). |
-| **react‑leaflet** | Interactive maps. |
-| **Recharts** | Charts (sparklines, bar charts, line charts). |
-| **react‑circular‑progressbar** | Livability score gauge. |
-| **qrcode.react** | QR code generation for visitor visits. |
-| **html2pdf.js** | Mock PDF export. |
-| **@faker-js/faker** | Mock data generation. |
+### Data Sources (MVP Ready)
 
-### Backend (Planned for future – currently all mock)
+* OpenWeatherMap → AQI & pollution
+* OpenStreetMap / Overpass API → Amenities
+* Open‑Elevation → Flood risk proxy
+* TRAI benchmarks → Internet speed
+* ISRO Bhuvan → Green cover analysis
 
-- Node.js + Express (REST API)
-- PostgreSQL (with PostGIS for geospatial queries)
-- Redis (caching)
-- JWT authentication
-
-### External APIs (to be integrated later)
-
-- OpenWeatherMap Air Pollution API (AQI)
-- Overpass API / OpenStreetMap (amenities, walkability)
-- Google Places API (schools, hospitals)
-- OSRM (routing & isochrones)
-- DigiLocker / Signzy (KYC verification)
+All APIs are mocked for MVP but architecture is designed for real integration.
 
 ---
 
-## 🚀 Installation & Setup
+# 🛠️ Tech Stack
 
-### Prerequisites
+## Frontend
 
-- Node.js 18+ and npm/yarn/pnpm
+* React 18 + Vite
+* React Router DOM
+* Tailwind CSS
+* Zustand
+* React Query
+* Recharts
 
-Figma Link :- https://www.figma.com/design/PsVdgzJknFFixgqsEJQ78E/Untitled?node-id=0-1&m=dev&t=N2MY0jxdtTEsMqIA-1
+## Backend
 
-### Steps
+* Node.js + Express
+* MongoDB Atlas
+* Mongoose
+* JWT Authentication
+-
+
+# 🏗️ Project Architecture
+
+```text
+React Frontend
+      ↓
+REST API (Express)
+      ↓
+MongoDB Atlas
+      ↓
+External Services & APIs
+```
+
+### Main API Modules
+
+* `/api/auth`
+* `/api/reports`
+* `/api/listings`
+* `/api/broker`
+* `/api/admin`
+* `/api/user`
+* `/api/analyzer`
+
+---
+
+# ⚙️ Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/your-org/hometrust.git
+cd hometrust
+```
+
+## Backend Setup
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Create a `.env` file:
+
+```env
+PORT=5000
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_secret
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_key
+CLOUDINARY_API_SECRET=your_secret
+```
+
+## Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+---
+
+# 📌 Main User Roles
+
+### Buyer / Renter
+
+* Search locality reports
+* Save & compare reports
+* Browse verified rentals
+* Report fake listings
+
+### Broker
+
+* Upload listings
+* Complete verification
+* Manage trust score
+* Track listing analytics
+
+### Admin
+
+* Review fake reports
+* Approve broker verification
+* Moderate flagged listings
+
+---
+
+# 🔌 Important API Endpoints
+
+| Method | Endpoint                   | Description           |
+| ------ | -------------------------- | --------------------- |
+| POST   | `/api/auth/register`       | Register user         |
+| POST   | `/api/auth/login`          | Login user            |
+| GET    | `/api/reports/:pincode`    | Fetch locality report |
+| GET    | `/api/listings`            | Fetch rental listings |
+| POST   | `/api/listings`            | Create listing        |
+| POST   | `/api/listings/:id/report` | Report fake listing   |
+| GET    | `/api/broker/dashboard`    | Broker analytics      |
+| GET    | `/api/admin/dashboard`     | Admin analytics       |
+
+---
+
+# 🌍 Live Links
+
+* **Frontend:** [https://home-trust-main.vercel.app/](https://home-trust-main.vercel.app/)
+* **Backend API:** [https://hometrust.onrender.com](https://hometrust.onrender.com)
+* **Postman Docs:** [https://documenter.getpostman.com/view/50839329/2sBXqKofES](https://documenter.getpostman.com/view/50839329/2sBXqKofES)
+* **Figma Design:** [https://www.figma.com/design/PsVdgzJknFFixgqsEJQ78E/Untitled](https://www.figma.com/design/PsVdgzJknFFixgqsEJQ78E/Untitled)
+* **YouTube Demo:** [https://youtu.be/V7J295BSAd0](https://youtu.be/V7J295BSAd0)
+
+---
+
+# 🔮 Future Improvements
+
+* Real‑time AQI & weather integration
+* User reviews for brokers & apartments
+* Rent negotiation assistant
+* Property appreciation prediction
+* React Native mobile app
+* Blockchain‑based verification
+
+---
+
+# 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to GitHub
+5. Open a Pull Request
+
+---
 
 
+---
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/hometrust.git
-   cd hometrust
+# ⭐ Why HomeTrust?
+
+HomeTrust focuses on **trust, transparency, and data‑driven real estate decisions**.
+
+Instead of relying only on broker claims or incomplete property portals, users get:
+
+* Verified rental listings
+* Reliable locality intelligence
+* Scam prevention system
+* Institutional‑grade property insights

@@ -50,4 +50,11 @@ router.post(
 // POST /api/listings/:id/visit – any authenticated user
 router.post('/:id/visit', verifyToken, controller.requestVisit);
 
+// GET /api/listings/favorites – any authenticated user
+router.get('/favorites', verifyToken, controller.getFavorites);
+
+// POST /api/listings/:id/favorite – toggle favorite
+router.post('/:id/favorite', verifyToken, controller.toggleFavorite);
+
 module.exports = router;
+

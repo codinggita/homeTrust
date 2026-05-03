@@ -252,7 +252,40 @@ const requestVisit = async (req, res) => {
   });
 };
 
+// ─── POST /api/listings/:id/favorite ─────────────────────────
+const toggleFavorite = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const listingId = req.params.id;
+
+  const isFavorite = user.favorites.includes(listingId);
+
+  if (isFavorite) {
+    user.favorites = user.favorites.filter(id => id.toString() !== listingId);
+  } else {
+    user.favorites.push(listingId);
+  }
+
+  await user.save();
+  return res.json({ 
+    message: isFavorite ? 'Removed from favorites' : 'Added to favorites',
+    isFavorite: !isFavorite 
+  });
+};
+
+// ─── GET /api/listings/favorites ─────────────────────────────
+const getFavorites = async (req, res) => {
+  const user = await User.findById(req.user._id).populate({
+    path: 'favorites',
+    match: { status: 'active' },
+    populate: { path: 'brokerId', select: 'profile.fullName brokerDetails.companyName' }
+  });
+
+  return res.json({ favorites: user.favorites });
+};
+
 module.exports = {
   getListings, getListingById, createListing,
   updateListing, deleteListing, reportListing, requestVisit,
+  toggleFavorite, getFavorites
 };
+

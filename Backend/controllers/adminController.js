@@ -207,4 +207,44 @@ const getAnalytics = async (req, res) => {
   });
 };
 
-module.exports = { getReportedListings, resolveReport, getVerificationQueue, verifyListing, getAnalytics };
+// ─── GET /api/admin/users ────────────────────────────────────
+const getAllUsers = async (req, res) => {
+  const { role, page = 1, limit = 20 } = req.query;
+  const pageNum  = Math.max(1, parseInt(page, 10));
+  const pageSize = Math.min(100, parseInt(limit, 10));
+
+  const filter = {};
+  if (role) filter.role = role;
+
+  const [users, total] = await Promise.all([
+    User.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * pageSize)
+      .limit(pageSize),
+    User.countDocuments(filter),
+  ]);
+
+  return res.json({ users, total, page: pageNum, totalPages: Math.ceil(total / pageSize) });
+};
+
+// ─── PATCH /api/admin/users/:id/status ───────────────────────
+const updateUserStatus = async (req, res) => {
+  const { isSuspended } = req.body;
+  const user = await User.findById(req.params.id);
+
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+  if (user.role !== 'broker') return res.status(400).json({ error: 'Only broker accounts can be suspended.' });
+
+  user.brokerDetails.isSuspended = isSuspended;
+  await user.save();
+
+  logger.info(`Admin ${req.user.email} ${isSuspended ? 'suspended' : 'unsuspended'} broker ${user.email}`);
+  return res.json({ message: `Broker ${isSuspended ? 'suspended' : 'unsuspended'} successfully.`, user });
+};
+
+module.exports = { 
+  getReportedListings, resolveReport, 
+  getVerificationQueue, verifyListing, 
+  getAnalytics, getAllUsers, updateUserStatus 
+};
+

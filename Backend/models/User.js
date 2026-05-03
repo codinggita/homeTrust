@@ -45,7 +45,15 @@ const userSchema = new mongoose.Schema({
       default : 'none',
     },
   },
+  
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing' }],
+
+  resetPasswordToken   : String,
+  resetPasswordExpires : Date,
+  refreshToken         : { type: String, select: false },
 }, {
+
+
   timestamps: true,
   toJSON: {
     transform(_doc, ret) {
